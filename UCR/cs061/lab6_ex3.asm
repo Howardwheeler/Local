@@ -23,39 +23,29 @@ LD R5, SUB_IS_PALINDROME
 JSRR R5
 
 LEA R4, WORD_ARRAY
+LEA R0, initial_prompt
+PUTS
+
+ITS_PRINT_LOOP_START
+    LDR R0, R4, #0
+    OUT
+    ADD R4, R4, #1
+    ADD R3, R3, #-1
+BRp ITS_PRINT_LOOP_START
+
 LD R2, PALINDROME_FLAG
 LDR R7, R2, #0
 BRp PRINT_ITS_PALINDROME
 BR PRINT_NOT_PALINDROME
 
 PRINT_ITS_PALINDROME
-    LEA R0, initial_prompt
-    PUTS
-
-    ITS_PRINT_LOOP_START
-        LDR R0, R4, #0
-        OUT
-        ADD R4, R4, #1
-        ADD R3, R3, #-1
-    BRp ITS_PRINT_LOOP_START
-
-    LEA R0, ITS_A_PALINDROME_PROMPT
-    PUTS
+LEA R0, ITS_A_PALINDROME_PROMPT
+PUTS
 BR FINISH
 
 PRINT_NOT_PALINDROME
-    LEA R0, initial_prompt
-    PUTS
-
-    NOT_PRINT_LOOP_START
-        LDR R0, R4, #0
-        OUT
-        ADD R4, R4, #1
-        ADD R3, R3, #-1
-    BRp NOT_PRINT_LOOP_START
-
-    LEA R0, NOT_A_PALINDROME_PROMPT
-    PUTS
+LEA R0, NOT_A_PALINDROME_PROMPT
+PUTS
 BR FINISH
 
 FINISH
@@ -139,6 +129,8 @@ AND R7, R7, #0
 LDR R1, R4, #0 ;loads first index
 ADD R7, R4, R3 ;offsets array by size
 LDR R0, R7, #-1 ;loads last index
+
+ADD R3, R3, #-2
 BR START_PALINDROME_LOOP
 
 PALINDROME_LOOP
@@ -147,9 +139,11 @@ PALINDROME_LOOP
     ADD R7, R4, R3
     LDR R0, R7, #-1
     
-START_PALINDROME_LOOP
+
     ADD R3, R3, #-2 ;subtracts 2 by size
     BRnz ITS_PALINDROME
+
+START_PALINDROME_LOOP
     JSRR R5 ;goes to subroutine to check
     
     NOT R0, R0

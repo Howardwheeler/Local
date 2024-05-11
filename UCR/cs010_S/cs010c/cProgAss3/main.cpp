@@ -25,9 +25,9 @@ using namespace std;
 
 void printOrders(Tree *tree) {
   cout << "Preorder = ";
-  tree->preOrder( );
+  tree->preOrder();
   cout << "Inorder = ";
-  tree->inOrder( );
+  tree->inOrder();
   cout << "Postorder = ";
   tree->postOrder( );
 }
@@ -72,7 +72,7 @@ int main( ) {
       getline(cin, entry);
       cout << endl;
       
-      tree.remove(entry);
+      //tree.remove(entry);
       
     } else if (choice == 3) {
       printOrders(&tree);
@@ -82,13 +82,13 @@ int main( ) {
       getline(cin, entry);
       cout << endl;
       
-      if (tree.search(entry)) {
+      if (tree.search(entry) != nullptr) {
         cout << "Found" << endl;
       } else {
         cout << "Not Found" << endl;
       }
     }
-
+    cin.clear();
     //fix buffer just in case non-numeric choice entered
     choice = menu();
   }

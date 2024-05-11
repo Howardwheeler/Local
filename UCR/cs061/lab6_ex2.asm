@@ -134,11 +134,12 @@ STR R5, R6, #0
 ADD R6, R6, #-1
 STR R3, R6, #0
 
-LD R5, SUB_TO_UPPER ;change to caps subroutine
 AND R7, R7, #0
 LDR R1, R4, #0 ;loads first index
 ADD R7, R4, R3 ;offsets array by size
 LDR R0, R7, #-1 ;loads last index
+
+ADD R3, R3, #-2
 BR START_PALINDROME_LOOP
 
 PALINDROME_LOOP
@@ -147,9 +148,10 @@ PALINDROME_LOOP
     ADD R7, R4, R3
     LDR R0, R7, #-1
     
-START_PALINDROME_LOOP
     ADD R3, R3, #-2 ;subtracts 2 by size
     BRnz ITS_PALINDROME
+    
+START_PALINDROME_LOOP
     
     NOT R0, R0
     ADD R0, R0, #1

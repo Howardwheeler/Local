@@ -1,8 +1,15 @@
 #pragma once
 
+#include <iostream>
 #include <string>
+#include <stdexcept>
 
+using std::cout;
+using std::cin;
+using std::endl;
 using std::string;
+using std::runtime_error;
+using std::overflow_error;
 
 class Node {
 
@@ -20,16 +27,6 @@ private:
 
 public:
   Node();
-
-  // CODE TURD:
-  // We want to use the explicit keyword here so that our
-  // single parameter constructor doesn't get mistaken
-  // for a conversion constructor.  See
-  // https://www.geeksforgeeks.org/problem-with-single-argument-constructor-in-c-and-how-to-solve-it/
-  explicit Node(const string& key);
-
-  // CODE TURD:
-  // We don't need a destructor here because everything is
-  // torn down in the Tree
-  
+  //use explicit so that code doesnt mistake it with conversion constructor
+  explicit Node(const string& word); 
 };

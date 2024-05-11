@@ -2,8 +2,6 @@
 
 #include "Node.h"
 
-using std::string;
-
 class Tree {
 private:
   Node* root;
@@ -11,32 +9,30 @@ private:
 public:
   Tree();
   ~Tree();
-  Tree(const Tree&) = delete;
-  Tree& operator=(const Tree&) = delete;
+  Tree(const Tree& cpy) = delete;
+  Tree& operator=(const Tree& rhs) = delete;
   
-  void insert( const string & );
+  void insert(const string &word);
   void preOrder() const;
   void inOrder() const;
   void postOrder() const;
-  void remove( const string & );
-  Node* search( const string & );
+  //void remove(const string & word);
+  Node* search(const string & word);
 
 private:
+  //void addData(Node* addHere, const string& word); was for insert
+  //void fix(Node* emptyNode);
+  //bool hasTwoChildSibling(Node* sibling) const;
 
-  // MASSIVE CODE TURD
-  // These helpers are suggested... the standard zybook solution used them
-  // and you may find defining these useful. Some you absolutely
-  // need (e.g. preOrder needs to have a helper function since it
-  // MUST be done recursively to cover all nodes).   Use these as
-  // a guide for planning what you might want to do.
 
-  bool noChildren(Node* curr) const;
-  void insert(Node* curr, const string& word);
-  void addData(Node* addHere, const string& word);
-  void preOrder(const Node* curr) const;
-  void inOrder(const Node* curr) const;
-  void postOrder(const Node* curr) const;
-  void fix(Node* emptyNode);
-  bool hasTwoChildSibling(Node* sibling) const;
-  Node* search(Node* curr, const string& word);
+  void preOrder(const Node* thisNode) const;
+  void inOrder(const Node* thisNode) const;
+  void postOrder(const Node* thisNode) const;
+  void insert(Node* thisNode, Node* thisParent, Node* insertNode);
+  void fixOrder(Node* thisNode) const;
+  void fixChildren(Node* thisNode) const;
+
+  bool noChildren(const Node* thisNode) const;
+  string whichStringIsMiddle(const string& small, const string& large, const string& word) const;
+  Node* search(Node* thisNode, const string& word);
 };
