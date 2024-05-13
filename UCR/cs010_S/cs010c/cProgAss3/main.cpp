@@ -72,7 +72,7 @@ int main( ) {
       getline(cin, entry);
       cout << endl;
       
-      //tree.remove(entry);
+      tree.remove(entry);
       
     } else if (choice == 3) {
       printOrders(&tree);

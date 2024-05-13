@@ -1,36 +1,5 @@
 #include "Tree.h"
 
-/* Uncomment these out if you want to use them... the 'static' means
-   that they are only available here in Tree.cpp
-
-static const string& midStr( const string& s1, const string& s2, const string& s3 ) {
-  if (( s1 < s2 && s1 > s3 ) ||( s1 < s3 && s1 > s2 ) ) 
-    return s1;
-  else if (( s2 < s1 && s2 > s3 ) ||( s2 < s3 && s2 > s1 ) ) 
-    return s2;
-  else 
-    return s3;
-}
-
-static const string& minStr( const string& s1, const string& s2, const string& s3 ) {
-  if ( s1 < s2 && s1 < s3 ) 
-    return s1;
-  else if ( s2 < s1 && s2 < s3 ) 
-    return s2;
-  else
-    return s3;
-}
-
-static const string& maxStr( const string& s1, const string& s2, const string& s3 ) {
-  if ( s1 > s2 && s1 > s3 ) 
-    return s1;
-  else if ( s2 > s1 && s2 > s3 ) 
-    return s2;
-  else
-    return s3;
-}
-*/
-
 Tree::Tree() {
   root = nullptr;
 }
@@ -42,47 +11,108 @@ Tree::~Tree() {
   // is empty
 }
 
-/*
+
 void Tree::remove(const string& word) {
-  // Nothing to do in an empty tree, just return
-  if ( !root )
+  if (!root){ //if root is nullptr?
     return;
-  
-  // Find the node that holds this key.  If it does not exist, then
-  // we have nothing to do.  Just return (no error)
-
-  // Removing the a key in the root is a special case
-  // If it is the last key, better set root back to nullptr!
-
-  // if the node to remove is not a leaf, move the value to a leaf
-  // TURD: (This is the easiest strategy to do a remove -- though the
-  // zybook isn't really clear about it)
-
-  // if we made an empty node (numData == 0), we have to fix it
+  }
+  Node* removeNode = search(word);
+  if(removeNode == nullptr){
+    return;
+  }
+  if(removeNode == root){
+    if(noChildren(removeNode)){
+      if(removeNode->large.empty() || removeNode->small.empty()){
+        root = nullptr;
+        return;
+      } else{
+        if(removeNode->large == word){
+          removeNode->large.clear();
+        } else{
+          removeNode->small.clear();
+          fixOrder(removeNode);
+        }
+      }
+    } else{
+      if(removeNode->large.empty()){
+        if(removeNode->left->large.empty() && removeNode->middle->large.empty()){
+          root = removeNode->left;
+          removeNode->left->large = removeNode->middle->small;
+          delete removeNode->middle;
+          delete removeNode;
+          return;
+        } else if(!removeNode->left->large.empty()){
+          removeNode->small = removeNode->left->large;
+          removeNode->left->large.clear();
+          return;
+        } else{
+          removeNode->small = removeNode->middle->small;
+          removeNode->middle->small.clear();
+          fixOrder(removeNode->middle);
+          return;
+        }
+      }
+    }
+  } else if(noChildren(removeNode)){
+    if(removeNode->parent->large.empty()){
+      if(removeNode->small == word){
+        removeNode->small.clear();
+      } else{
+        removeNode->large.clear();
+      }
+      if(removeNode->small.empty() && removeNode->large.empty()){
+        if(removeNode->parent->left == removeNode){
+          if(removeNode->parent->middle->large.empty()){
+            removeNode->parent->large = removeNode->parent->middle->small;
+            removeNode->parent->middle = nullptr;
+            removeNode->parent->left = nullptr;
+            return;
+          } else{
+            fix(removeNode);
+            return;
+          }
+        } else if(removeNode->parent->middle == removeNode){
+          if(removeNode->parent->left->large.empty()){
+            removeNode->parent->large = removeNode->parent->left->small;
+            fixOrder(removeNode->parent);
+            removeNode->parent->left = nullptr;
+            removeNode->parent->middle = nullptr;
+            return;
+          } else{
+            fix(removeNode);
+            return;
+          }
+        }
+      }
+    }
+  }
 }
 
 void Tree::fix(Node* emptyNode) {
-  // This is where the real heart of the program is at...
-  // We have to deal with fusion, rotation, redistribution
-  // here
+  if(emptyNode->parent->left == emptyNode){
+    emptyNode->parent->small = emptyNode->small;
+    emptyNode->parent->small = emptyNode->parent->middle->small;
+    fixOrder(emptyNode->parent->middle);
+    return;
+  } else if(emptyNode->parent->middle == emptyNode){
+    emptyNode->parent->small = emptyNode->small;
+    emptyNode->parent->small = emptyNode->parent->left->small;
+    fixOrder(emptyNode->parent->left);
+    return;
+  }
 
-  // Some cases:
-  // emptyNode is nullptr, do nothing
-  // emptyNode is the root, one of our children becomes the root
 
-  // check for redistribution... Can I steal from a sibling with two keys?
-
-  // If not, I have to do a merge
 }
 
-bool Tree::hasTwoChildSibling(Node* sib) const {
-  throw runtime_error("this one will be handy");
-}*/
-
-
-
-
-
+bool Tree::hasTwoChildSibling(Node* thisNode) const {
+  if(thisNode->parent == nullptr){
+    return false;
+  } else if(!thisNode->parent->left || !thisNode->parent->middle || !thisNode->parent->right){
+    return false;
+  } else{
+    return true;
+  }
+}
 
 void Tree::preOrder() const {
   preOrder(root);
@@ -95,7 +125,9 @@ void Tree::preOrder(const Node* thisNode) const{ //why is the node const?
   }
   cout << thisNode->small << ", ";
   preOrder(thisNode->left);
-  cout << thisNode->large << ", ";
+  if(!thisNode->large.empty()){
+    cout << thisNode->large << ", ";
+  }
   preOrder(thisNode->middle);
   preOrder(thisNode->right);
 }
@@ -112,7 +144,9 @@ void Tree::inOrder(const Node* thisNode) const{
   inOrder(thisNode->left);
   cout << thisNode->small << ", ";
   inOrder(thisNode->middle);
-  cout << thisNode->large << ", ";
+  if(!thisNode->large.empty()){
+    cout << thisNode->large << ", ";
+  }
   inOrder(thisNode->right);
 }
 
@@ -129,7 +163,9 @@ void Tree::postOrder(const Node* thisNode) const{
   postOrder(thisNode->middle);
   cout << thisNode->small << ", ";
   postOrder(thisNode->right);
-  cout << thisNode->large << ", ";
+  if(!thisNode->large.empty()){
+    cout << thisNode->large << ", ";
+  }
 }
 
 void Tree::insert(const string &word){
@@ -138,16 +174,7 @@ void Tree::insert(const string &word){
   } else if(root == nullptr){       //checks if the root doesn't exist, then makes new root
     root = new Node(word);
   } else{             //otherwise, finds correct leaf node
-    Node* thisNode = root;
-    while(!noChildren(thisNode)){
-      if(word < thisNode->small){
-        thisNode = thisNode->left;
-      } else if(word > thisNode->large){
-        thisNode = thisNode->right;
-      } else{
-        thisNode = thisNode->middle;
-      }
-    }
+    Node* thisNode = findLeaf(root, word);
     Node* insertNode = new Node(word);
     insert(thisNode, thisNode->parent, insertNode);
   }
@@ -166,10 +193,10 @@ void Tree::insert(Node* thisNode, Node* thisParent, Node* insertNode){
     thisNode->numData++;
     delete insertNode;
     fixOrder(thisNode);
-    fixChildren(thisNode);
     return;
   } else{
     Node* thisNodeSibling;
+    int flag = 0;
     string middle = whichStringIsMiddle(thisNode->small, thisNode->large, insertNode->small);
     if (middle == insertNode->small){
       thisNodeSibling = new Node(thisNode->large);
@@ -191,8 +218,14 @@ void Tree::insert(Node* thisNode, Node* thisParent, Node* insertNode){
       insert(thisParent, nullptr, insertNode);
       insertNode->left = thisNode;
       insertNode->middle = thisNodeSibling;
-      fixChildren(insertNode);
+      thisNode->parent = insertNode;
+      thisNodeSibling->parent = insertNode;
     } else{
+      if(thisParent != nullptr && (thisParent->small.empty() || thisParent->large.empty())){
+        flag++;
+      }
+      insert(thisParent, thisParent->parent, insertNode);
+
       if(thisNode == thisParent->left){
         thisParent->left = nullptr;
       } else if(thisNode == thisParent->middle){
@@ -200,86 +233,144 @@ void Tree::insert(Node* thisNode, Node* thisParent, Node* insertNode){
       } else{
         thisParent->right = nullptr;
       }
-      insert(thisParent, thisParent->parent, insertNode);
-      thisParent->left = thisNode;
-      thisParent->middle = thisNodeSibling;
-      fixChildren(thisParent);
+      if(flag > 0){
+        if(thisParent->left != nullptr){
+          thisParent->middle = thisNode;
+          thisParent->right = thisNodeSibling;
+        } else if(thisParent->middle != nullptr){
+          thisParent->left = thisNode;
+          thisParent->right =thisNodeSibling;
+        } else{
+          thisParent->left = thisNode;
+          thisParent->middle = thisNodeSibling;
+        }
+        thisNode->parent = thisParent;
+        thisNodeSibling->parent = thisParent;
+      } else{
+        insertNode->left = thisNode;
+        insertNode->middle = thisNodeSibling;
+        thisNode->parent = insertNode;
+        thisNodeSibling->parent = insertNode;
+      }
     }
     return;
   }
 }
 
-void Tree::fixChildren(Node* thisNode) const {
-  Node* placeholder;
+Node* Tree::findLeaf(Node* thisNode, const string& word) const{
   if(noChildren(thisNode)){
-    return;
+    return thisNode;
   }
-  while(true) {
-    if(thisNode->large.empty()){
-      if(thisNode->right != nullptr && thisNode->small > thisNode->right->large) {
-        placeholder = thisNode->right;
-        thisNode->right = thisNode->middle;
-        thisNode->middle = thisNode->left;
-        thisNode->left = placeholder;
-        cout << "check check4" << endl;
-      } else if(thisNode->middle != nullptr && thisNode->small > thisNode->middle->large) {
-        placeholder = thisNode->middle;
-        thisNode->middle = thisNode->left;
-        thisNode->left = placeholder;
-        cout << "check check4" << endl;
-      } else if(true){
-
-      }
-    } else if(!thisNode->large.empty()){
-      if(thisNode->left != nullptr && thisNode->large < thisNode->left->small) {
-        placeholder = thisNode->left;
-        thisNode->left = thisNode->right;
-        thisNode->right = thisNode->middle;
-        thisNode->middle = placeholder;
-        cout << "check check1" << endl;
-      } else if(thisNode->middle != nullptr && thisNode->large < thisNode->middle->small) {
-        placeholder = thisNode->middle;
-        thisNode->middle = thisNode->right;
-        thisNode->right = placeholder;
-        cout << "check check2" << endl;
-      }
+  if(!thisNode->small.empty() && !thisNode->large.empty()){
+    if(word < thisNode->small){
+      return findLeaf(thisNode->left, word);
+    } else if(word < thisNode->large){
+      return findLeaf(thisNode->middle, word);
     } else{
-      break;
+      return findLeaf(thisNode->right, word);
     }
-
-
-
-    if(thisNode->left != nullptr && thisNode->middle != nullptr){
-      if(thisNode->left->small > thisNode->middle->small){
-        placeholder = thisNode->left;
-        thisNode->left = thisNode->middle;
-        thisNode->middle = placeholder;
-      }
-    } else if(thisNode->left != nullptr && thisNode->right != nullptr){
-      if(thisNode->left->small > thisNode->right->small){
-        placeholder = thisNode->left;
-        thisNode->left = thisNode->right;
-        thisNode->right = placeholder;
-      }
-    } else if(thisNode){
-      //give up point
+  } else if(thisNode->large.empty()){
+    if (word < thisNode->small){
+      return findLeaf(thisNode->left, word);
+    } else{
+      return findLeaf(thisNode->middle, word);
+    }
+  } else{
+    if(word < thisNode->large){
+      return findLeaf(thisNode->middle, word);
+    } else{
+      return findLeaf(thisNode->right, word);
     }
   }
 }
 
 void Tree::fixOrder(Node* thisNode) const{
-  if(thisNode->small.empty()){
+  if(thisNode->small.empty() && thisNode->large.empty()){
+    return;
+  } else if(thisNode->small.empty()){
     thisNode->small = thisNode->large;
     thisNode->large.clear();
+
+    //double check this function??
+    /*Node* placeholder = thisNode->left;
     thisNode->left = thisNode->middle;
     thisNode->middle = thisNode->right;
+    thisNode->right = placeholder;
+    */
     return;
-  }
-  if(thisNode->small > thisNode->large){
+  } else if(thisNode->large.empty()){
+    return;
+  } else if(thisNode->small > thisNode->large){
     string placeholder = thisNode->small;
     thisNode->small = thisNode->large;
     thisNode->large = placeholder;
+    return;
+  } else{
+    return;
   }
+}
+
+void Tree::fixChildren(Node* thisNode) const {
+  if(noChildren(thisNode)){
+    return;
+  }
+  if(thisNode->large.empty()){
+    if(thisNode->middle == nullptr && thisNode->right == nullptr){
+      return;
+    } else if(thisNode->left == nullptr && thisNode->middle == nullptr){
+      swap(thisNode->left, thisNode->right);
+      return;
+    } else if(thisNode->left == nullptr && thisNode->right == nullptr){
+      swap(thisNode->left, thisNode->middle);
+      return;
+    } else{
+      if(thisNode->right != nullptr){
+        if(thisNode->left == nullptr){
+          swap(thisNode->left, thisNode->right);
+        } else{
+          swap(thisNode->middle, thisNode->right);
+        }
+        fixChildren(thisNode);
+      } else{
+        swap(thisNode->left, thisNode->middle);
+        return;
+      }
+    }
+  } else{
+    if(thisNode->left == nullptr || thisNode->middle == nullptr || thisNode->left == nullptr){
+      if(thisNode->left == nullptr){
+        swap(thisNode->left, thisNode->right);
+      } else if(thisNode->middle == nullptr){
+        swap (thisNode->middle, thisNode->right);
+      }
+      if(thisNode->left->small > thisNode->middle->small){
+        swap(thisNode->left, thisNode->middle);
+      }
+      return;
+    } else{
+      if(thisNode->left->small < thisNode->middle->small && thisNode->middle->small < thisNode->right->small){
+        return;
+      } else{
+        if(thisNode->left->small > thisNode->middle->small){
+          swap(thisNode->left, thisNode->middle);
+          fixChildren(thisNode);
+        } else{
+          swap(thisNode->middle, thisNode->right);
+          fixChildren(thisNode);
+        }
+      }
+    }
+  }
+}
+
+void Tree::swap(Node* node1, Node* node2) const{
+  if(node1 == nullptr || node2 == nullptr){
+    return;
+  }
+  Node* placeholder = node1;
+  node1 = node2;
+  node2 = placeholder;
+  return;
 }
 
 Node* Tree::search(const string& word) {
@@ -292,13 +383,19 @@ Node* Tree::search(Node* thisNode, const string&word){
   }
   if(thisNode->small == word || thisNode->large == word){
     return thisNode;
+  } else if(thisNode->large.empty()){
+    if(word < thisNode->small){
+      return search(thisNode->left, word);
+    } else{
+      return search(thisNode->middle, word);
+    }
   } else{
     if(word < thisNode->small){
       return search(thisNode->left, word);
-    } else if(word > thisNode->large){
-      return search(thisNode->right, word);
-    } else{
+    } else if(word < thisNode->large){
       return search(thisNode->middle, word);
+    } else{
+      return search(thisNode->right, word);
     }
   }
 }
