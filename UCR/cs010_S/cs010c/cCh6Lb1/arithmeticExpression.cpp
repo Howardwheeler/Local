@@ -3,19 +3,69 @@
 arithmeticExpression::arithmeticExpression(const string& expression) : infixExpression(expression), root(nullptr) {}
 
 void arithmeticExpression::buildTree() {
-  throw runtime_error("not implemented");
+    string postFix = infix_to_postfix();
+    stack<TreeNode*> node;
+
+    int key = 'a';
+    for(unsigned i = 0; i < postFix.size(); i++){
+        char character = postFix[i];
+        TreeNode* newNode = new TreeNode(character, key++);
+        if(isalnum(character)){
+            node.push(newNode);
+        } else{
+            newNode->right = node.top();
+            node.pop();
+            newNode->left = node.top();
+            node.pop();
+            node.push(newNode);
+        }
+    }
+    root = node.top();
 }
 
 void arithmeticExpression::infix() {
-  throw runtime_error("not implemented");
+  infix(root);
 }
 
 void arithmeticExpression::prefix() {
-  throw runtime_error("not implemented");
+  prefix(root);
 }
 
 void arithmeticExpression::postfix() {
-  throw runtime_error("not implemented");
+  postfix(root);
+}
+
+void arithmeticExpression::infix(TreeNode* root){
+    if(root == nullptr){
+        return;
+    }
+    if (root->left || root->right){
+        cout << "(";
+    }
+    infix(root->left);
+    cout << root->data;
+    infix(root->right);
+    if (root->left || root->right){
+        cout << ")";
+    }
+}
+
+void arithmeticExpression::prefix(TreeNode* root){
+    if(root == nullptr){
+        return;
+    }
+    cout << root->data;
+    prefix(root->left);
+    prefix(root->right);
+}
+
+void arithmeticExpression::postfix(TreeNode* root){
+    if(root == nullptr){
+        return;
+    }
+    postfix(root->left);
+    postfix(root->right);
+    cout << root->data;
 }
 
 int arithmeticExpression::priority(char op){
@@ -87,4 +137,18 @@ void arithmeticExpression::visualizeTree(const string &outputFilename){
     string jpgFilename = outputFilename.substr(0,outputFilename.size()-4)+".jpg";
     string command = "dot -Tjpg " + outputFilename + " -o " + jpgFilename;
     system(command.c_str());
+}
+
+void arithmeticExpression::visualizeTree(ofstream &out, TreeNode* root){
+    if(!root){
+        return;
+    }
+    if(root->left){
+        out << "\"" << root->data << "(" << root->key << ")\"" << "-> " << "\"" << root->left->data << "(" << root->left->key << ")\"" << endl;
+        visualizeTree(out, root->left);
+    }
+    if(root->right){
+        out << "\"" << root->data << "(" << root->key << ")\"" << "-> " << "\"" << root->right->data << "(" << root->right->key << ")\"" << endl;
+        visualizeTree(out, root->right);
+    }
 }

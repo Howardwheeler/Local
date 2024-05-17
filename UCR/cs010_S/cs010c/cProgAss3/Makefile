@@ -12,4 +12,4 @@ $(TARGET): $(SRCS)
 	$(CXX) $(CXXFLAGS) $(SRCS) -o $(TARGET)
 
 run: $(TARGET)
-	.\$(TARGET) < test7.in
+	.\$(TARGET) < test.in
