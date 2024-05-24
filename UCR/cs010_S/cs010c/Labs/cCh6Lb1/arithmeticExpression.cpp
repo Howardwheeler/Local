@@ -1,18 +1,19 @@
 #include "arithmeticExpression.h"
 
 arithmeticExpression::arithmeticExpression(const string& expression) : infixExpression(expression), root(nullptr) {}
+//constructs a tree using the expression given
 
-void arithmeticExpression::buildTree() {
+void arithmeticExpression::buildTree() {    //builds the tree using the expression that is converted from infix to postfix
     string postFix = infix_to_postfix();
     stack<TreeNode*> node;
 
     int key = 'a';
-    for(unsigned i = 0; i < postFix.size(); i++){
+    for(unsigned i = 0; i < postFix.size(); i++){  //iterates through postfix expression
         char character = postFix[i];
         TreeNode* newNode = new TreeNode(character, key++);
-        if(isalnum(character)){
+        if(isalnum(character)){ //makes new node of the operand and pushes onto the stack
             node.push(newNode);
-        } else{
+        } else{ //otherwise, pops the 2 operands from the stack and set them as children nodes and make their parent an operator
             newNode->right = node.top();
             node.pop();
             newNode->left = node.top();
@@ -20,10 +21,10 @@ void arithmeticExpression::buildTree() {
             node.push(newNode);
         }
     }
-    root = node.top();
+    root = node.top(); //then set root to the top element of the stack
 }
 
-void arithmeticExpression::infix() {
+void arithmeticExpression::infix() { //recursive calls for infix, prefix, and postfix
   infix(root);
 }
 
@@ -35,7 +36,7 @@ void arithmeticExpression::postfix() {
   postfix(root);
 }
 
-void arithmeticExpression::infix(TreeNode* root){
+void arithmeticExpression::infix(TreeNode* root){ //prints the infix expression by recursively iterating through the tree
     if(root == nullptr){
         return;
     }
@@ -50,7 +51,7 @@ void arithmeticExpression::infix(TreeNode* root){
     }
 }
 
-void arithmeticExpression::prefix(TreeNode* root){
+void arithmeticExpression::prefix(TreeNode* root){ //prints the prefix expression by recursively iterating through the tree
     if(root == nullptr){
         return;
     }
@@ -59,7 +60,7 @@ void arithmeticExpression::prefix(TreeNode* root){
     prefix(root->right);
 }
 
-void arithmeticExpression::postfix(TreeNode* root){
+void arithmeticExpression::postfix(TreeNode* root){ //prints the postfix expression by recursively iterating through the tree
     if(root == nullptr){
         return;
     }
@@ -68,8 +69,8 @@ void arithmeticExpression::postfix(TreeNode* root){
     cout << root->data;
 }
 
-int arithmeticExpression::priority(char op){
-    int priority = 0;
+int arithmeticExpression::priority(char op){ //helper function that determines the priority listings of the operators
+    int priority = 0; //its basically like PEMDAS kinda
     if(op == '('){
         priority =  3;
     }
@@ -82,27 +83,27 @@ int arithmeticExpression::priority(char op){
     return priority;
 }
 
-string arithmeticExpression::infix_to_postfix(){
+string arithmeticExpression::infix_to_postfix(){ //helper function that converts the given infix expression to postfix expression
     stack<char> s;
     ostringstream oss;
     char c;
     for(unsigned i = 0; i< infixExpression.size();++i){
         c = infixExpression.at(i);
-        if(c == ' '){
+        if(c == ' '){ //if white space, continue
             continue;
         }
         if(c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')'){ //c is an operator
-            if( c == '('){
+            if( c == '('){ //pushes ( onto stack initially)
                 s.push(c);
             }
-            else if(c == ')'){
+            else if(c == ')'){  //otherwise, if ), then you pop all the operators and (
                 while(s.top() != '('){
                     oss << s.top();
                     s.pop();
                 }
                 s.pop();
             }
-            else{
+            else{ //otherwise, pop the operators depending on their priority then push the given operator on the stack
                 while(!s.empty() && priority(c) <= priority(s.top())){
                     if(s.top() == '('){
                         break;
@@ -116,7 +117,7 @@ string arithmeticExpression::infix_to_postfix(){
         else{ //c is an operand
             oss << c;
         }
-    }
+    } //then output the remaining stack to oss
     while(!s.empty()){
         oss << s.top();
         s.pop();
@@ -124,7 +125,7 @@ string arithmeticExpression::infix_to_postfix(){
     return oss.str();
 }
 
-void arithmeticExpression::visualizeTree(const string &outputFilename){
+void arithmeticExpression::visualizeTree(const string &outputFilename){ //test cases and a recursive call to visualize the tree to terminal
     ofstream outFS(outputFilename.c_str());
     if(!outFS.is_open()){
         cout<<"Error opening "<< outputFilename<<endl;
@@ -139,7 +140,7 @@ void arithmeticExpression::visualizeTree(const string &outputFilename){
     system(command.c_str());
 }
 
-void arithmeticExpression::visualizeTree(ofstream &out, TreeNode* root){
+void arithmeticExpression::visualizeTree(ofstream &out, TreeNode* root){ //prints out the tree to out
     if(!root){
         return;
     }
