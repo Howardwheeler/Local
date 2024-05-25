@@ -15,8 +15,7 @@ struct Node{
     string data;
     Node* left;
     Node* right;
-    int height;
 
-    Node() : data(0), left(nullptr), right(nullptr), height(0) {}
-    Node(const string &val) : data(val), left(nullptr), right(nullptr), height(0){}
+    Node() : data(NULL), left(nullptr), right(nullptr) {}
+    Node(const string &word) : data(word), left(nullptr), right(nullptr) {}
 };
