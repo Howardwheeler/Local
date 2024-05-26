@@ -4,6 +4,10 @@
         "stdexcept": "cpp",
         "iostream": "cpp",
         "xstring": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "iosfwd": "cpp",
+        "list": "cpp",
+        "stack": "cpp",
+        "xutility": "cpp"
     }
 }
