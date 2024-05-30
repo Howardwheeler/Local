@@ -1,7 +1,7 @@
 #include "WordEntry.h"
 
 // Adds a new appearance of the word with the given score
-void WordEntry::addNewAppearance(int score) {
+void WordEntry::addNewAppearance(int score){
     totalScore += score;
     numAppearances++;
 }
