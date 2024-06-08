@@ -1,42 +1,43 @@
 #pragma once
 
 #include <iostream>
-#include <string>
 #include <queue>
+#include <vector>
+#include <string>
 
 using std::string;
+using std::vector;
+using std::queue;
+using std::ifstream; //zybooks uses these
+using std::istreambuf_iterator; //zybooks uses these
 
-struct Node {
+struct Node{ //node struct
     int jugA, jugB, cost;
-    std::string steps;
-    Node(int a, int b, int c, const std::string& s) : jugA(a), jugB(b), cost(c), steps(s) {}
+    string steps;
+    Node() : jugA(0), jugB(0), cost(0) {} //makes the node with starting values
+    Node(int jugA, int jugB, int cost, const string steps) : jugA(jugA), jugB(jugB), cost(cost), steps(steps) {} //makes a new node with updated jug values
+
+    bool operator==(const Node& other) const { return jugA == other.jugA && jugB == other.jugB; } //comparison bool operator that compares a node's jug A and jug B values with a const Node&'s values
 };
 
-class Jug {
-    int Ca, Cb, N, cfA, cfB, ceA, ceB, cpAB, cpBA;
-    bool* visited;
+struct pathQueue{ //queue of nodes struct
+    queue<Node> jugQueue;
+};
+
+class Jug{ //jug class
+    const int Ca, Cb, N, cfA, cfB, ceA, ceB, cpAB, cpBA;
+    queue<pathQueue> storageQueue; //queue for storing jugQueues
+    vector<Node> visitedStates; //notes down visited states
 public:
-    // Constructor to initialize the Jug object
     Jug(int Ca, int Cb, int N, int cfA, int cfB, int ceA, int ceB, int cpAB, int cpBA);
-
-    // Destructor
     ~Jug();
+    Jug(const Jug& cpy) = delete;
+    Jug& operator=(const Jug& rhs) = delete;
 
-    // Method to solve the jug problem
-    // Returns:
-    // -1 if invalid inputs
-    //  0 if inputs are valid but a solution does not exist
-    //  1 if solution is found and stores solution steps in solution string
-    int solve(string& solution);
-
+    int solve(string& solution); //function in main call, solves path
+    void shortestPath(); //helper function that finds shortest path to N, basically breadth first search
 private:
-
-    // Helper function to check if inputs are valid
-    bool isValidInput();
-
-    // Helper function to perform BFS and find the cheapest solution
-    int BFS(string& solution);
-
-    // Helper function to generate next states
-    void generateNextStates(Node& node, std::queue<Node>& q, const std::string& currSteps);
+    bool isValidInput() const; //helper checks if input is valid
+    bool isVisited(const Node newNode) const; //helper checks if the state has been visited
+    void possibleTasks(const Node stackTop, pathQueue newPath); //switch case for multiple possible jug steps
 };
