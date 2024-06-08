@@ -1,24 +1,13 @@
-// CODETURD: I've written this with three sorts (and left yours blank)
-// CODETURD: You can just replace bubble with quick, merge with quickm,
-// CODETURD: and radix with insertion.
-// CODETURD: 
-// CODETURD: But, before you do; run the program as is.  Take a look at
-// CODETURD: the times.  You'll see merge sort is the early leader and
-// CODETURD: radix sort is kinda slow because of all the extra data
-// CODETURD: handling.  But, as the sizes get bigger, a pattern emerges!
-// CODETURD: 
-// CODETURD: For 1 point of LAB extra credit, join the #secret channel
-// CODETURD: (it is in our workspace) and post your times for size 50,000
-// CODETURD: using just my sorts O(n**2), O(n log n), O(n)
-// CODETURD: 
-// CODETURD: SHHH... don't tell anyone about the channel... It is our
-// CODETURD: little secret!
-
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
+#include <algorithm>
+
 using std::cout;
 using std::endl;
+using std::vector;
+using std::sort;
 
 // Using clock() is pretty old school and does not take advantage
 // of better precision timers.  But is fine for our purposes.  I'll
@@ -32,7 +21,7 @@ const int CLOCKS_PER_MS = CLOCKS_PER_SEC/1000; //clock per milliseconds
 using std::chrono::steady_clock;
 using std::chrono::microseconds;
 using std::chrono::time_point;
-using std::chrono::high_resolution_clock;
+using std::chrono::steady_clock;
 using std::chrono::duration_cast;
 
 // If using C++ 14, this is better as constexpr
@@ -56,16 +45,58 @@ void fillArrays(int arr1[], int arr2[],int arr3[]) {
 // CODETURD: in your Zybook.  Use it for both versions of quicksort
 // CODETURD: Note that quicksort will recursively call itself... that
 // CODETURD: is the point!
-void QPartition(int numbers[], int low, int high) {
+int QPartition(int numbers[], int low, int high) {
+  int pivot = numbers[high];                                          //set pivot value to the far most right,
+  int lowIndex = low - 1;                                             //shift one to the left
+  for (int highIndex = low; highIndex < high; highIndex++) {          //iterate though all the numbers between low and high indexes
+      if (numbers[highIndex] <= pivot) {                              //if the value selected is bigger than the pivot value,
+        lowIndex++;                                                   //move onto the next low index swap that value and the lowIndex value
+        std::swap(numbers[lowIndex], numbers[highIndex]);
+      }
+    }
+    std::swap(numbers[lowIndex + 1], numbers[high]);                  //then place back the pivot to its correct position
+    return lowIndex + 1;                                              //returns the partitoined index value
 }
 
 void Quicksort_midpoint(int numbers[], int i, int k) {
+  if(i >= k){                                                         //base case for if the low is greater than high, sorting is finished
+    return;
+  }
+  int pivot = (i + k) / 2;                                            //set midpoint pivot index
+  std::swap(numbers[pivot], numbers[k]);                              //place pivot value out of the way
+  int partitionIndex = QPartition(numbers, i, k);                     //partition the array and get the partition index
+  Quicksort_midpoint(numbers, i, partitionIndex-1);                   //recursively quicksorts both sides of the pivot over until finished sorting
+  Quicksort_midpoint(numbers, partitionIndex+1, k);
 }
 
 void Quicksort_medianOfThree(int numbers[], int i, int k) {
+  if(i >= k){                                                         //base case for if the low is greater than high, sorting is finished
+    return;
+  }
+
+  int pivot = (i + k) / 2;                                            //set midpoint pivot index
+  if (numbers[i] > numbers[pivot]) {                                  //swaps low value with pivot value if pivot value is less than low value
+    std::swap(numbers[i], numbers[pivot]);
+  }
+  if (numbers[i] > numbers[k]) {                                      //swaps low and high value if high value is less than low value
+    std::swap(numbers[i], numbers[k]);
+  }
+  if (numbers[pivot] > numbers[k]) {                                  //swaps high value with pivot value if pivot value is more than high value
+    std::swap(numbers[pivot], numbers[k]);
+  }
+  std::swap(numbers[pivot], numbers[k - 1]);                          //then swaps the pivoting value with the value before highest
+
+  int partitionIndex = QPartition(numbers, i, k - 1);                 //partition the array and get the partition index
+  Quicksort_medianOfThree(numbers, i, partitionIndex-1);              //recursively quicksorts both sides of the pivot over until finished sorting
+  Quicksort_medianOfThree(numbers, partitionIndex+1, k);
 }
 
 void InsertionSort(int numbers[], int numbersSize) {
+  for (int i  = 1; i < numbersSize; i++){                             //starting from the second index, compares each value
+    for(int j = i; j > 0 && numbers[j-1] > numbers[j]; j--){          //if the value at index j is greater than the current i index, swap the 2 values
+      std::swap(numbers[j-1], numbers[j]);                            //repeat for every value in the array and should be sorted at the end
+    }
+  }
 }
 
 // We can compare other sorts we've talked about
@@ -119,14 +150,14 @@ int main() {
       copy_vector_into_array(sample, test_array);
       // CODETURD: Pick one timing scheme or the other and remove
       // CODETURD: the one you don't use
-      time_point<steady_clock> start = high_resolution_clock::now();
+      time_point<steady_clock> start = steady_clock::now();
       // clock_t Start = clock();
       BubbleSort(test_array, size);
       // clock_t End = clock();
       // int elapsedTime = (End - Start)/CLOCKS_PER_MS;
       // cout << elapsedTime << " ms" << endl;
 
-      time_point<steady_clock> stop = high_resolution_clock::now();
+      time_point<steady_clock> stop = steady_clock::now();
       microseconds duration = duration_cast<microseconds>(stop - start);
       cout << duration.count() << " ms for bubble sort " << endl;
       cout << "Sort is " << ((is_sorted(test_array,size))?"GOOD":"BAD") << endl;
@@ -137,14 +168,14 @@ int main() {
       copy_vector_into_array(sample, test_array);
       // CODETURD: Pick one timing scheme or the other and remove
       // CODETURD: the one you don't use
-      time_point<steady_clock> start = high_resolution_clock::now();
+      time_point<steady_clock> start = steady_clock::now();
       // clock_t Start = clock();
       MergeSort(test_array, 0, size-1);
       // clock_t End = clock();
       // int elapsedTime = (End - Start)/CLOCKS_PER_MS;
       // cout << elapsedTime << " ms" << endl;
 
-      time_point<steady_clock> stop = high_resolution_clock::now();
+      time_point<steady_clock> stop = steady_clock::now();
       microseconds duration = duration_cast<microseconds>(stop - start);
       cout << duration.count() << " ms for merge sort " << endl;
       cout << "Sort is " << ((is_sorted(test_array,size))?"GOOD":"BAD") << endl;
@@ -155,14 +186,14 @@ int main() {
       copy_vector_into_array(sample, test_array);
       // CODETURD: Pick one timing scheme or the other and remove
       // CODETURD: the one you don't use
-      time_point<steady_clock> start = high_resolution_clock::now();
+      time_point<steady_clock> start = steady_clock::now();
       // clock_t Start = clock();
       RadixSort(test_array, size);
       // clock_t End = clock();
       // int elapsedTime = (End - Start)/CLOCKS_PER_MS;
       // cout << elapsedTime << " ms" << endl;
 
-      time_point<steady_clock> stop = high_resolution_clock::now();
+      time_point<steady_clock> stop = steady_clock::now();
       microseconds duration = duration_cast<microseconds>(stop - start);
       cout << duration.count() << " ms for radix sort " << endl;
       cout << "Sort is " << ((is_sorted(test_array,size))?"GOOD":"BAD") << endl;

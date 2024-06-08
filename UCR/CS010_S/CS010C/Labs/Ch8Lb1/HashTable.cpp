@@ -2,23 +2,28 @@
 
 // Constructor to initialize the hash table with a given size
 HashTable::HashTable(int size) : size(size) {
-    hashTable = new list<WordEntry>[size];
+    hashTable = new list<WordEntry>[size];		//makes a new list of word entries with a constant size
+}
+
+// Destructor to deallocate the hash table
+HashTable::~HashTable(){
+	delete[] hashTable;						//deletes the array of list of wordEntry
 }
 
 // Hash function to compute an index based on the word
-int HashTable::computeHash(const string &word) const{
-    unsigned long hash = 5381;
-    for(char c : word) {
-        hash = ((hash << 5) + hash) + c;
+int HashTable::computeHash(const string &word) const{  //this function computes the hash function to find the correct "bucket" or technically index.
+    unsigned long hash = 5381;							//this hash function was chatGPT'ed !!! works tho
+    for(char currChar : word) {
+        hash = ((hash << 5) + hash) + currChar;
     }
-    return hash % size;
+    return hash % size;									//returns the hash index
 }
 
 // Checks if the word is already in the hash table
 bool HashTable::contains(const string &word) const{
-    int index = computeHash(word);
-    for(const auto &entry : hashTable[index]) {
-        if(entry.getWord() == word) {
+    int index = computeHash(word);						//finds the index using the hash function
+    for(const auto &selectWord : hashTable[index]) {	//iterates through the whole list of the selected index and compares the word passed in and the word in the list
+        if(selectWord.getWord() == word) {				//if the 2 words match, it exists and returns true, otherwise no
             return true;
         }
     }
@@ -27,25 +32,25 @@ bool HashTable::contains(const string &word) const{
 
 // Retrieves the average score for the word
 double HashTable::getAverage(const string &word) const{
-    int index = computeHash(word);
-    for(const auto &entry : hashTable[index]) {
-        if(entry.getWord() == word) {
-            return entry.getAverage();
+    int index = computeHash(word);						//finds the index using the hash function
+    for(const auto &selectWord : hashTable[index]) {	//iterates thruogh the whole list of the selected index and compares the word passed in and the word in the list
+        if(selectWord.getWord() == word) {				//if the words match, call the get average helper from wordEntry to return the average. 
+            return selectWord.getAverage();
         }
     }
-    return 2.0;  // Default to neutral if word not found
+    return 2.0;  										//otherwise, default to neutral sentiment if word not found
 }
 
 // Inserts a word with its score into the hash table
 void HashTable::put(const string &word, int score) {
-    int index = computeHash(word);
-    for(auto &entry : hashTable[index]) {
-        if(entry.getWord() == word) {
-            entry.addNewAppearance(score);
+    int index = computeHash(word);						//finds index again, same thing
+    for(auto &selectWord : hashTable[index]) {			//iterates thruogh the whole list and compares again
+        if(selectWord.getWord() == word) {				//if the 2 words match, add the score to the appearance in wordEntry
+            selectWord.addNewAppearance(score);
             return;
         }
     }
-    hashTable[index].emplace_back(word, score);
+    hashTable[index].emplace_back(word, score);			//otherwise, make a new copy of the word and the score passed in, and adds it to the end of the list
 }
 
 int main() {
