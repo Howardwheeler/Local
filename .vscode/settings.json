@@ -10,6 +10,7 @@
         "stack": "cpp",
         "xutility": "cpp",
         "queue": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "utility": "cpp"
     }
 }
